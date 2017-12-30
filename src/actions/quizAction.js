@@ -1,23 +1,14 @@
 import * as actionTypes from './actionTypes';
+import {data} from '../data/questions';
 
-export const getNextQuestion = (question) => {
-  //console.log("quizAction:: getNextQuestion : question ", question);
+export const getQuestion = (questionId) => {
+  //console.log("quizAction:: getNextQuestion : questionId ", questionId);
   return {
     type: actionTypes.NEXT_QUESTION,
-    question
+    question : getCurrentQuestion(questionId),
+    totalQuestions : getTotalQuestion()
   }
 };
-
-export const addPoints = (answer) => {
-  console.log("QuizAction:: addPoints : ", answer);
-
-  return {
-    type: actionTypes.ADD_POINTS,
-    answer
-  }
-};
-
-
 
 export const submitAnswers = () => {
   console.log("quizAction:: childCompFunction");
@@ -25,3 +16,16 @@ export const submitAnswers = () => {
     type: actionTypes.SUBMIT_ANSWERS
   }
 };
+// ---------------------API--
+const getCurrentQuestion = (questionId) => {
+  return data.questionData.filter(question => question.questionId === questionId)[0];
+}
+
+const getTotalQuestion = () => {
+  return data.questionData.length;
+}
+
+
+
+
+

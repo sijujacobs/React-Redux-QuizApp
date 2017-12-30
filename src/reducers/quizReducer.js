@@ -5,12 +5,22 @@ export default (state = [], action) => {
 
       switch (action.type){
         case actionTypes.NEXT_QUESTION:
-          //console.log("quizReducer:: state --> : ", state);
-          //console.log("quizReducer:: action --> : ", action);
-          return Object.assign( {}, state, { question : action.question } )
+		  //console.log('quizReducer:: Initial state:', state);
+    //   const newState = Object.assign({}, state, { 
+	// 				  currentQuestion : action.question, 
+	// 				  totalQuestions : action.totalQuestions
+	// 				});
+    //   return newState;
+          return Object.assign( {}, state, { 
+			currentQuestion : action.question, 
+			totalQuestions : action.totalQuestions
+          } )
           // return [
           //   ...state,
-          //   Object.assign({}, action.question)
+          //   {
+          //     currentQuestion: action.question,
+          //     completed: false
+          //   }
           // ];
         case actionTypes.ADD_POINTS:
           let selectedAnswerId = 0;

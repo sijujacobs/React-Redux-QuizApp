@@ -1,65 +1,76 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import * as quizAction from '../actions/quizAction';
+import ResultComponent from './ResultComponent';
 
-
-class AnswerComponent extends Component {
-
-  optionButtonClick(answer){
-    let answerObj = {
-      answerId : answer.id, 
-      answerPoint : answer.points,
-      questionId : this.props.question.questionId
+export default class AnswerComponent extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            answeredQuestions : []
+        }
     }
-    this.props.addPoints(answerObj);
-  }
 
-  hasAnswerSelected(questionId, answerId){
-    var sAnswers = this.props.selectedAnswers;
-    var hasSelected = false;
-    for(var i = 0; i < sAnswers.length; i++){
-      var thisAns = sAnswers[i];
-      if( (thisAns.answerId === answerId) && (thisAns.questionId === questionId) ){
-        hasSelected = true;
-        break;
-      }
+    hasAnswerSelected(questionId, answerId){
+        var answeredQuestions = this.state.answeredQuestions;
+        var hasSelected = false;
+        for(var i = 0; i < answeredQuestions.length; i++){
+            var thisAnsQuestion = answeredQuestions[i];
+            if( (thisAnsQuestion.questionId === questionId) && (thisAnsQuestion.answerId === answerId) ){
+                hasSelected = true;
+                break;
+            }
+        }
+        return hasSelected;
     }
-    return hasSelected;
-  }
 
-  render() {
-    var elements = [];
-    if(this.props.question.answers){
-      elements = this.props.question.answers.map((item, index) => {
-        var thisAnserSelected = this.hasAnswerSelected(this.props.question.questionId, item.id);
-        let thisItemClass = thisAnserSelected ? "selectedAnswer" : "optionButton";
+    updateQuestionsAnswered(selectedAnswer){
+        var tempAnswers = this.state.answeredQuestions;
+        var currentQuestionID = this.props.question.questionId;
+        let currentQuestionAnswer = {
+            questionId : currentQuestionID,
+            answerId : selectedAnswer.id,
+            points  : selectedAnswer.points
+        }
+
+        var found = false;
+        for(let i=0; i < tempAnswers.length; i++){
+            var thisAQ = tempAnswers[i];
+            if(thisAQ.questionId === currentQuestionID){
+                tempAnswers[i] = currentQuestionAnswer;
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            tempAnswers.push(currentQuestionAnswer)
+        }
+        this.setState({
+            answeredQuestions : tempAnswers
+        })
+        this.props.updateComponent(this.state.answeredQuestions)
+        this.refs.resultComp.setTotalPoints(this.state.answeredQuestions);
+    }
+
+    render() {
+        
+        let elements = [];
+        if(this.props.question.answers){
+            elements = this.props.question.answers.map((item, index) => {
+                var thisAnserSelected = this.hasAnswerSelected(this.props.question.questionId, item.id);
+                let thisItemClass = thisAnserSelected ? "selectedAnswer" : "optionButton";
+                return (
+                    <div className={thisItemClass} key={index} onClick={() => {this.updateQuestionsAnswered(item)} }> {item.answer}</div>
+                )
+            })
+        }
         return (
-            <div className={thisItemClass} ref={item.id} data-answerid={item.id} key={index} onClick={this.optionButtonClick.bind(this, item)}> {item.answer}</div>
-        )
-    })
+                <div className="answerContainer">
+                    <div>{elements}</div>
+                    <ResultComponent ref="resultComp"  className="resultComponent" 
+                    totalQuestions={this.props.totalQuestions} answeredQuestions={this.state.answeredQuestions} />
+                </div>
+                );
     }
-    return (
-          <div className="answerContainer" onClick={this.props.childCompClick}>
-              
-              <div className="optionContainer">
-                {elements}
-              </div>
-          </div>
-    );
-  }
 }
-const mapStateToProps = (state, ownProps) => {
-  return {
-    totalPoints : state.totalPoints,
-    selectedAnswerId : state.selectedAnswerId,
-    selectedAnswers : state.selectedAnswers
-  }
-};
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addPoints: (answerObj) => dispatch(quizAction.addPoints(answerObj))
-  }
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnswerComponent);
+

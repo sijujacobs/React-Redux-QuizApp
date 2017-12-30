@@ -9,10 +9,10 @@ import { createStore } from 'redux';
 import quizReducer from './reducers/quizReducer';
 
     let defaultState = {
-        question : {},
-        totalPoints : 0,
-        selectedAnswerId : 0,
-        selectedAnswers : []
+        currentQuestion     : {},
+        selectedAnswer      : {},
+        questionsAnswered   : [],
+        totalQuestions      : 0
     }
     const store = createStore(quizReducer, defaultState);
 
